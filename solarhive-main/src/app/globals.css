@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #1D63C6;
+  --color-gold-light: #4C8FE0;
+  --color-cream: #FFF4D6;
+  --color-leaf: #2E9E46;
+  --color-leaf-dark: #1F7A33;
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+}
+
+body {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 18s linear infinite;
+}
