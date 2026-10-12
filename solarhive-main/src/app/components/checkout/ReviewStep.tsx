@@ -5,6 +5,7 @@ import { CreditCard, UploadCloud, Zap, ShieldCheck, Loader2, Truck } from "lucid
 import { PaymentMethod } from "./PaymentMethodStep";
 import { CartItem } from "../../context/CartContext";
 import { DeliveryDetails } from "./DeliveryForm";
+import { normalizeNigerianPhone } from "@/lib/validation";
 
 type ReviewStepProps = {
   paymentMethod: PaymentMethod;
@@ -123,7 +124,7 @@ const ReviewStep = ({
     }
 
     const reference = `SH-${Date.now()}`;
-    const [firstName, ...rest] = delivery.fullName.trim().split(" ");
+    const [firstName, ...rest] = delivery.fullName.trim().split(/\s+/);
     const lastName = rest.join(" ") || firstName;
     const origin = window.location.origin;
 
@@ -136,7 +137,7 @@ const ReviewStep = ({
         first_name: firstName,
         last_name: lastName,
         email: delivery.email,
-        phone: delivery.phone,
+        phone: normalizeNigerianPhone(delivery.phone) ?? delivery.phone,
         merchant_reference: reference,
         items: items.map((item) => ({
           name: item.name,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, nextId } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { normalizeNigerianPhone, validateDelivery } from "@/lib/validation";
 
 const PAYMENT_METHODS = ["bank-transfer", "installments", "klump"];
 const MAX_RECEIPT_BYTES = 5 * 1024 * 1024;
@@ -27,14 +28,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payment method" }, { status: 400 });
   }
 
-  const fullName = String(formData.get("fullName") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
-  const phone = String(formData.get("phone") ?? "").trim();
-  const address = String(formData.get("address") ?? "").trim();
-  const city = String(formData.get("city") ?? "").trim();
-  if (!fullName || !email || !phone || !address || !city) {
-    return NextResponse.json({ error: "Missing delivery details" }, { status: 400 });
+  const delivery = {
+    fullName: String(formData.get("fullName") ?? "").trim(),
+    email: String(formData.get("email") ?? "").trim().toLowerCase(),
+    phone: String(formData.get("phone") ?? "").trim(),
+    address: String(formData.get("address") ?? "").trim(),
+    city: String(formData.get("city") ?? "").trim(),
+  };
+  const deliveryErrors = validateDelivery(delivery);
+  const firstError = Object.values(deliveryErrors)[0];
+  if (firstError) {
+    return NextResponse.json({ error: firstError, fields: deliveryErrors }, { status: 400 });
   }
+  const { fullName, email, address, city } = delivery;
+  const phone = normalizeNigerianPhone(delivery.phone)!;
 
   const subtotal = Number(formData.get("subtotal"));
   const deliveryFee = Number(formData.get("deliveryFee"));
