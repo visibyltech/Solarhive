@@ -13,11 +13,12 @@ type OrderItemInput = {
   qty?: number;
 };
 
-// Public route — checkout works for guests. If a session cookie is present
-// the order is linked to that user; otherwise it's recorded from the
-// delivery form details alone, same as any guest checkout.
+// Signed-in users only — the order is linked to the session user.
 export async function POST(request: NextRequest) {
   const sessionUser = await getSessionUser(request);
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Please sign in to place an order" }, { status: 401 });
+  }
 
   const formData = await request.formData();
 

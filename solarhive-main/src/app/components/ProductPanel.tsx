@@ -26,13 +26,13 @@ const ProductCard = ({ product }: { product: Product }) => {
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = () => {
-    addToCart({ id: product.id, name: product.name, image: product.image, price: product.price });
+    if (!addToCart({ id: product.id, name: product.name, image: product.image, price: product.price })) return;
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
 
   return (
-    <div>
+    <div className="flex w-[calc(50%-12px)] flex-col sm:w-[calc(33.333%-16px)] lg:w-[calc(20%-19.2px)]">
       <Link href={`/product/${product.id}`} className="relative block aspect-square overflow-hidden rounded-2xl">
         <Image
           src={product.image}
@@ -41,18 +41,18 @@ const ProductCard = ({ product }: { product: Product }) => {
           className="object-cover"
         />
       </Link>
-      <Link href={`/product/${product.id}`}>
-        <p className="mt-3 text-xs font-medium tracking-wide text-black/70 uppercase hover:text-gold">
+      <Link href={`/product/${product.id}`} title={product.name}>
+        <p className="mt-3 line-clamp-2 text-xs font-medium tracking-wide text-black/70 uppercase hover:text-gold">
           {product.name}
         </p>
       </Link>
-      <p className="mt-1 text-sm font-semibold text-gold">
+      <p className="mt-1 mb-3 text-sm font-semibold text-gold">
         ₦{product.price.toLocaleString()}
       </p>
 
       <button
         onClick={handleAddToCart}
-        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-md py-2 text-xs font-semibold uppercase transition ${
+        className={`mt-auto flex w-full items-center justify-center gap-2 rounded-md py-2 text-xs font-semibold uppercase transition ${
           added ? "bg-green-500 text-black" : "bg-gold text-black hover:bg-gold/90"
         }`}
       >
@@ -78,7 +78,7 @@ const ProductPanel = ({ heading, subtitle, products, ctaLabel, showDots }: Produ
         <p className="mt-2 text-sm text-black/50">{subtitle}</p>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mt-8 flex flex-wrap justify-center gap-6">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

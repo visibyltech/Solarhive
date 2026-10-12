@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { getNextPath, useAuth } from "../context/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function SignupPage() {
     }
 
     await refresh();
-    router.push("/");
+    router.push(getNextPath());
   };
 
   return (

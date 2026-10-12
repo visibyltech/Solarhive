@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "./AuthContext";
 
 export type CartItem = {
   id: number;
@@ -12,7 +14,8 @@ export type CartItem = {
 
 type CartContextType = {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, "qty">, qty?: number) => void;
+  // Returns false (and sends guests to the login page) when not signed in.
+  addToCart: (item: Omit<CartItem, "qty">, qty?: number) => boolean;
   removeFromCart: (id: number) => void;
   updateQty: (id: number, qty: number) => void;
   clearCart: () => void;
@@ -27,6 +30,9 @@ const STORAGE_KEY = "rtd-cart";
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     Promise.resolve().then(() => {
@@ -51,6 +57,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [items, hydrated]);
 
   const addToCart: CartContextType["addToCart"] = (product, qty = 1) => {
+    if (!user) {
+      if (!loading) router.push(`/login?next=${encodeURIComponent(pathname)}`);
+      return false;
+    }
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -60,6 +70,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prev, { ...product, qty }];
     });
+    return true;
   };
 
   const removeFromCart = (id: number) => {

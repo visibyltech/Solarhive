@@ -54,6 +54,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// Reads the `next` query param set when a guest is bounced to /login, allowing
+// only same-site paths so it can't be used as an open redirect.
+export const getNextPath = () => {
+  const next = new URLSearchParams(window.location.search).get("next");
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");

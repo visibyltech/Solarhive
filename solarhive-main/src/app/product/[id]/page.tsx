@@ -83,10 +83,11 @@ export default function ProductDetailPage() {
   const wishlisted = isWishlisted(product.id);
 
   const handleAddToCart = () => {
-    addToCart(
+    const ok = addToCart(
       { id: product.id, name: product.name, image: product.image ?? "", price: product.price },
       qty
     );
+    if (!ok) return;
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };

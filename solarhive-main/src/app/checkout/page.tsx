@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import CheckoutStepper from "../components/checkout/CheckoutStepper";
 import OrderSummary, { DELIVERY_FEE } from "../components/checkout/OrderSummary";
 import DeliveryForm, { DeliveryDetails } from "../components/checkout/DeliveryForm";
@@ -12,6 +14,8 @@ import ReviewStep from "../components/checkout/ReviewStep";
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
@@ -27,11 +31,19 @@ export default function CheckoutPage() {
 
   const total = subtotal + (items.length > 0 ? DELIVERY_FEE : 0);
 
+  useEffect(() => {
+    if (!loading && !user) router.replace("/login?next=%2Fcheckout");
+  }, [loading, user, router]);
+
   const handlePlaceOrder = (placedOrderNumber: string) => {
     setOrderNumber(placedOrderNumber);
     setOrderPlaced(true);
     clearCart();
   };
+
+  if (!user) {
+    return <p className="mx-10 mt-16 text-center text-sm text-black/50">Loading…</p>;
+  }
 
   if (orderPlaced) {
     return (

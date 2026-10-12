@@ -46,7 +46,7 @@ const ShopProductCard = ({
     : 0;
 
   const handleAddToCart = () => {
-    addToCart({ id: product.id, name: product.name, image: product.image, price: product.price });
+    if (!addToCart({ id: product.id, name: product.name, image: product.image, price: product.price })) return;
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
